@@ -19,6 +19,7 @@ pub(crate) const VERSIONED_HASH_VERSION_KZG: u8 = 0x01;
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct IndexedBlobHash {
     /// The index of the blob
+    #[cfg_attr(feature = "serde", serde(with = "alloy_serde::quantity"))]
     pub index: u64,
     /// The hash of the blob
     pub hash: B256,
