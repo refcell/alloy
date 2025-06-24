@@ -633,7 +633,7 @@ impl Expander {
         let tx_type_enum_name = &self.tx_type_enum_name;
         let (impl_generics, ty_generics, _) = self.generics.split_for_impl();
         let alloy_consensus = &self.alloy_consensus;
-        let arbitrary = quote! { #alloy_consensus::private::arbitrary };
+        let private = quote! { #alloy_consensus::private };
 
         let num_variants = self.variants.all.len();
 
@@ -653,8 +653,8 @@ impl Expander {
         let variant_types = self.variants.variant_types();
 
         quote! {
-            impl #arbitrary::Arbitrary<'_> for #tx_type_enum_name {
-                fn arbitrary(u: &mut #arbitrary::Unstructured<'_>) -> #arbitrary::Result<Self> {
+            impl #private::arbitrary::Arbitrary<'_> for #tx_type_enum_name {
+                fn arbitrary(u: &mut #private::arbitrary::Unstructured<'_>) -> #private::arbitrary::Result<Self> {
                     match u.int_in_range(0..=#num_variants-1)? {
                         #(#tx_type_arms,)*
                         _ => unreachable!(),
@@ -662,11 +662,11 @@ impl Expander {
                 }
             }
 
-            impl #impl_generics #arbitrary::Arbitrary<'_> for #input_type_name #ty_generics
+            impl #impl_generics #private::arbitrary::Arbitrary<'_> for #input_type_name #ty_generics
             where
-                #(#variant_types: for<'a> #arbitrary::Arbitrary<'a>),*
+                #(#variant_types: for<'a> #private::arbitrary::Arbitrary<'a>),*
             {
-                fn arbitrary(u: &mut #arbitrary::Unstructured<'_>) -> #arbitrary::Result<Self> {
+                fn arbitrary(u: &mut #private::arbitrary::Unstructured<'_>) -> #private::arbitrary::Result<Self> {
                     match u.int_in_range(0..=#num_variants-1)? {
                         #(#enum_variant_arms,)*
                         _ => unreachable!(),
